@@ -16,7 +16,7 @@ class JSONParser implements ParserInterface {
         $output = json_decode($input);
 
         if (is_null($output)) {
-            throw new InvalidJSONException();
+            throw new InvalidJSONException(__CLASS__);
         }
 
         if (!is_object($output) || empty(get_object_vars($output))) {

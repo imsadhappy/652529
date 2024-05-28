@@ -11,5 +11,8 @@
     "scripts": {
         "tests": "php ./vendor/bin/phpunit --testdox tests",
         "run-app": "php app.php input.txt"
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
     }
 }

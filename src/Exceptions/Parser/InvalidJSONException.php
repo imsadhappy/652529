@@ -4,10 +4,10 @@ namespace App\Exceptions\Parser;
 
 final class InvalidJSONException extends \Exception
 {
-    public function __construct()
+    public function __construct($thrownIn)
     {
 
-        $message = "Couldn't parse JSON: ";
+        $message = "Couldn't parse JSON in $thrownIn: ";
 
         switch (json_last_error()) {
             case JSON_ERROR_DEPTH:
