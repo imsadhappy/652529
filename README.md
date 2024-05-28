@@ -1,3 +1,21 @@
+## Start
+
+Install app with:
+```
+composer intall
+```
+
+## Test
+
+Run tests with:
+```
+composer tests
+```
+or
+```
+./vendor/bin/phpunit --testdox tests
+```
+
 ## Running the code
 
 Assuming PHP code is in `app.php`, you could run it by this command, output might be different due to dynamic data:
