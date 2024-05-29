@@ -9,41 +9,41 @@ use App\Providers\RapidAPIBinChecker;
 
 class RapidAPIBinCheckerTest extends EnvTestCase
 {
-    private BinToCountryCodeConverterInterface $binConverterProvider;
+    private static ?BinToCountryCodeConverterInterface $binConverterProvider;
 
     public function testAbortOnInvalidBin(): void
     {
         $this->expectException(ClientException::class);
-        $this->binConverterProvider->getCountryCode('999');
+        self::$binConverterProvider->getCountryCode('999');
     }
 
     public function testGetCountryCode(): void
     {
-        $countryCode = $this->binConverterProvider->getCountryCode('41417360');
+        $countryCode = self::$binConverterProvider->getCountryCode('41417360');
         $this->assertEquals('US', $countryCode);
     }
 
     protected function assertPreConditions(): void
     {
-        if (empty($this->binConverterProvider)) {
+        if (empty(self::$binConverterProvider)) {
             $this->markTestSkipped('Using other provider or API key not set');
         }
     }
 
     protected function setUp(): void
     {
-        if (empty($this->binConverterProvider) &&
+        if (empty(self::$binConverterProvider) &&
             isset(self::$env['BIN_CONVERTER_PROVIDER']) &&
             self::$env['BIN_CONVERTER_PROVIDER'] == 'App\Providers\RapidAPIBinChecker' &&
             isset(self::$env['BIN_CONVERTER_PROVIDER_KEY']) &&
             !empty(self::$env['BIN_CONVERTER_PROVIDER_KEY'])) {
-                $this->binConverterProvider = new RapidAPIBinChecker(self::$env['BIN_CONVERTER_PROVIDER_KEY']);
+                self::$binConverterProvider = new RapidAPIBinChecker(self::$env['BIN_CONVERTER_PROVIDER_KEY']);
         }
     }
 
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-        $this->binConverterProvider = null;
+        self::$binConverterProvider = null;
     }
 }

@@ -8,7 +8,7 @@ use App\Exceptions\Reader\FileNotFoundOrEmptyException;
 
 class FileReaderTest extends TestCase
 {
-    private static $reader;
+    private static ?FileReader $reader;
 
     public function testAbortIfFileNotFound(): void
     {
@@ -26,21 +26,6 @@ class FileReaderTest extends TestCase
     {
         $value = 'bar';
         $this->assertEquals($value, $this->tryReadingFromMock($value));
-    }
-
-    public static function setUpBeforeClass(): void
-    {
-        self::$reader = new FileReader();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        self::$reader = null;
-    }
-
-    protected function tearDown(): void
-    {
-        @unlink($this->mockFile());
     }
 
     protected function tryReadingFromMock($value = null): string
@@ -61,8 +46,18 @@ class FileReaderTest extends TestCase
         return $filePath;
     }
 
+    public static function setUpBeforeClass(): void
+    {
+        self::$reader = new FileReader();
+    }
+
     public static function tearDownAfterClass(): void
     {
         self::$reader = null;
+    }
+
+    protected function tearDown(): void
+    {
+        @unlink($this->mockFile());
     }
 }

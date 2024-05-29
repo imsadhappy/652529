@@ -9,41 +9,41 @@ use GuzzleHttp\Exception\ClientException;
 
 class ExchangerateAPITest extends EnvTestCase
 {
-    private ExchangeRateProviderInterface $exchangeRateProvider;
+    private static ?ExchangeRateProviderInterface $exchangeRateProvider;
 
     public function testAbortOnInvalidCurrencyCode(): void
     {
         $this->expectException(ClientException::class);
-        $this->exchangeRateProvider->getRate('FOO', 'BAR');
+        self::$exchangeRateProvider->getRate('FOO', 'BAR');
     }
 
     public function testGetRate(): void
     {
-        $exchangeRate = $this->exchangeRateProvider->getRate('USD', 'USD');
+        $exchangeRate = self::$exchangeRateProvider->getRate('USD', 'USD');
         $this->assertEquals(1, $exchangeRate);
     }
 
     protected function assertPreConditions(): void
     {
-        if (empty($this->exchangeRateProvider)) {
+        if (empty(self::$exchangeRateProvider)) {
             $this->markTestSkipped('Using other provider or API key not set');
         }
     }
 
     protected function setUp(): void
     {
-        if (empty($this->exchangeRateProvider) &&
+        if (empty(self::$exchangeRateProvider) &&
             isset(self::$env['EXCHANGE_RATE_PROVIDER']) &&
             self::$env['EXCHANGE_RATE_PROVIDER'] == 'App\Providers\ExchangerateAPI' &&
             isset(self::$env['EXCHANGE_RATE_PROVIDER_KEY']) &&
             !empty(self::$env['EXCHANGE_RATE_PROVIDER_KEY'])) {
-                $this->exchangeRateProvider = new ExchangerateAPI(self::$env['EXCHANGE_RATE_PROVIDER_KEY']);
+                self::$exchangeRateProvider = new ExchangerateAPI(self::$env['EXCHANGE_RATE_PROVIDER_KEY']);
         }
     }
 
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-        $this->exchangeRateProvider = null;
+        self::$exchangeRateProvider = null;
     }
 }

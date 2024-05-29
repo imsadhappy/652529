@@ -10,8 +10,6 @@ use App\Interfaces\CommissionCalculatorInterface;
 class CommissionCalculatorsTest extends TestCase
 {
 
-    private CommissionCalculatorInterface $commissionCalculator;
-
     public function testAbortForNegativeNumbers(): void
     {
         $this->expectException(\RangeException::class);

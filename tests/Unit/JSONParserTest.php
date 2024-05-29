@@ -9,33 +9,38 @@ use App\Exceptions\Parser\InvalidRecordException;
 
 class JSONParserTest extends TestCase
 {
+    private static ?JSONParser $parser;
+
     public function testAbortOnInvalidJson(): void
     {
         $this->expectException(InvalidJSONException::class);
-        $this->tryParsing('foobar');
+        self::$parser->parse('foobar');
     }
 
     public function testAbortOnInvalidRecord(): void
     {
         $this->expectException(InvalidRecordException::class);
-        $this->tryParsing('[]');
+        self::$parser->parse('[]');
     }
 
     public function testAbortOnEmptyRecord(): void
     {
         $this->expectException(InvalidRecordException::class);
-        $this->tryParsing('{}');
+        self::$parser->parse('{}');
     }
 
     public function testParseRecords(): void
     {
-        $this->assertIsObject($this->tryParsing('{"foo":"bar"}'));
+        $this->assertIsObject(self::$parser->parse('{"foo":"bar"}'));
     }
 
-    private function tryParsing($data): object
+    public static function setUpBeforeClass(): void
     {
-        $parser = new JSONParser();
+        self::$parser = new JSONParser();
+    }
 
-        return $parser->parse($data);
+    public static function tearDownAfterClass(): void
+    {
+        self::$parser = null;
     }
 }

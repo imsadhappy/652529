@@ -10,25 +10,35 @@ use App\Exceptions\DataTransformer\MissingPropertyException;
 
 class TransactionsFromJSONTest extends TestCase
 {
-    private $validRecord = '{"bin":"123","amount":"100.00","currency":"GBP"}';
-    private $invalidRecord = '{"foo":"bar"}';
+    private static ?JSONParser $parser;
+    private static ?TransactionDataTransformer $transformer;
 
     public function testAbortOnMissingProperty(): void
     {
         $this->expectException(MissingPropertyException::class);
-        $this->tryTransforming($this->invalidRecord);
+        $invalidRecord = '{"foo":"bar"}';
+        $data = self::$parser->parse($invalidRecord);
+        $tranform = self::$transformer;
+        $tranform($data);
     }
 
     public function testTransformJsonRecordIntoTransaction(): void
     {
-        $this->assertInstanceOf(Transaction::class, $this->tryTransforming($this->validRecord));
+        $validRecord = '{"bin":"123","amount":"100.00","currency":"GBP"}';
+        $data = self::$parser->parse($validRecord);
+        $tranform = self::$transformer;
+        $this->assertInstanceOf(Transaction::class, $tranform($data));
     }
 
-    protected function tryTransforming(string $record): Transaction
+    public static function setUpBeforeClass(): void
     {
-        $parser = new JSONParser();
-        $transformer = new TransactionDataTransformer();
+        self::$parser = new JSONParser();
+        self::$transformer = new TransactionDataTransformer();
+    }
 
-        return $transformer($parser->parse($record));
+    public static function tearDownAfterClass(): void
+    {
+        self::$parser = null;
+        self::$transformer = null;
     }
 }
