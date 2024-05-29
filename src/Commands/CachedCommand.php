@@ -2,21 +2,26 @@
 
 namespace App\Commands;
 
+use App\Interfaces\CommandInterface;
 use App\Traits\SimpleFileCache;
 
-abstract class CachedCommand {
+abstract class CachedCommand implements CommandInterface {
 
     use SimpleFileCache;
 
-    protected function preloadCacheFor(array $vars)
+    protected array $cachedVars;
+
+    abstract public function run(): void;
+
+    protected function preloadCachedVars(): void
     {
-        foreach($vars as $var => $exp) {
+        foreach($this->cachedVars as $var => $exp) {
             $data = $this->readFromCache(get_called_class().'-'.$var, $exp);
             $this->{$var} = empty($data) ? [] : unserialize($data);
         }
     }
 
-    protected function getCachedOrLoad(string $key, string $from, callable $load)
+    protected function getCachedOrLoad(string $key, string $from, callable $load): mixed
     {
         if (isset($this->{$from}[$key])) {
             return $this->{$from}[$key];

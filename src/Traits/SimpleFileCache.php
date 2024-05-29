@@ -14,7 +14,7 @@ trait SimpleFileCache {
         return sprintf("%s/%s.cache", $dirName, mb_ereg_replace("([\.]{2,})", '-', $fileName));
     }
 
-    public function readFromCache(string $fileName, int $expirationPeriod): mixed
+    public function readFromCache(string $fileName, int $expirationTime): mixed
     {
         $filePath = self::filePath($fileName);
 
@@ -22,7 +22,7 @@ trait SimpleFileCache {
             return null;
         }
 
-        if (time() - filemtime($filePath) < $expirationPeriod) {
+        if (time() - filemtime($filePath) < $expirationTime) {
             return file_get_contents($filePath);
         }
 

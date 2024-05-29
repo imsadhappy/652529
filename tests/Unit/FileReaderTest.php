@@ -60,4 +60,9 @@ class FileReaderTest extends TestCase
 
         return $filePath;
     }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$reader = null;
+    }
 }

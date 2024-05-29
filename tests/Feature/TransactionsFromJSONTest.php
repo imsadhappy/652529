@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use App\Utils\JSONParser;
@@ -8,7 +8,7 @@ use App\DataTransformers\TransactionDataTransformer;
 use App\Dto\Transaction;
 use App\Exceptions\DataTransformer\MissingPropertyException;
 
-class TransactionDataTransformerTest extends TestCase
+class TransactionsFromJSONTest extends TestCase
 {
     private $validRecord = '{"bin":"123","amount":"100.00","currency":"GBP"}';
     private $invalidRecord = '{"foo":"bar"}';
@@ -19,7 +19,7 @@ class TransactionDataTransformerTest extends TestCase
         $this->tryTransforming($this->invalidRecord);
     }
 
-    public function testTransformRecordIntoTransaction(): void
+    public function testTransformJsonRecordIntoTransaction(): void
     {
         $this->assertInstanceOf(Transaction::class, $this->tryTransforming($this->validRecord));
     }

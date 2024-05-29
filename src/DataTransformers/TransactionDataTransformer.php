@@ -2,10 +2,11 @@
 
 namespace App\DataTransformers;
 
+use App\Interfaces\DataTransformerInterface;
 use App\Dto\Transaction;
 use App\Exceptions\DataTransformer\MissingPropertyException;
 
-class TransactionDataTransformer {
+class TransactionDataTransformer implements DataTransformerInterface {
 
     /**
      * Transform object into DTO

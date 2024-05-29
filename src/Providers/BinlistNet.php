@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Providers;
 
-use App\Services\HttpServiceProvider;
+use App\Providers\HttpServiceProvider;
 use App\Interfaces\BinToCountryCodeConverterInterface;
 
 class BinlistNet extends HttpServiceProvider implements BinToCountryCodeConverterInterface {
