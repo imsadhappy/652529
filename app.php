@@ -13,8 +13,9 @@ $_ENV = array_merge($_ENV, [
     'COMMAND' => 'App\Commands\CalculateTransactionCommissionCommand',
     'COMMISION_READER' => 'App\Utils\FileReader',
     'COMMISION_PARSER' => 'App\Utils\JSONParser',
+    'COMMISION_WRITER' => 'App\Utils\StdOutWriter',
     'COMMISION_CALCULATOR' => 'App\DataTransformers\EUCommissionCalculator',
-    'BIN_CONVERTER_CACHE_EXPIRATION' => strtotime('+1 hour') - time()
+    'BIN_CONVERTER_CACHE_EXPIRATION' => strtotime('+1 day') - time()
 ], parse_ini_file(__DIR__.'/.env'));
 
 require_once __DIR__.'/src/run-command.php';

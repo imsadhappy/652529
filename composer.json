@@ -17,8 +17,8 @@
         }
     },
     "scripts": {
-        "tests": "@php ./vendor/bin/phpunit --testdox tests",
-        "app:run": "@php app.php input.txt",
+        "run:tests": "@php ./vendor/bin/phpunit --testdox tests",
+        "run:app": "@php app.php input.txt",
         "post-install-cmd": "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     },
     "require": {
