@@ -6,11 +6,14 @@ use App\Commands\CachedCommand;
 use App\Interfaces\ReaderInterface;
 use App\Interfaces\ParserInterface;
 use App\DataTransformers\TransactionDataTransformer;
+use App\DataTransformers\TransactionCurrencyDataTransformer;
 use App\Interfaces\BinToCountryCodeConverterInterface;
 use App\Interfaces\CommissionCalculatorInterface;
 use App\Interfaces\ExchangeRateProviderInterface;
 
-final class CalculateCommissionsCommand extends CachedCommand {
+use Brick\Math\RoundingMode;
+
+final class CalculateTransactionCommissionCommand extends CachedCommand {
 
     private string $readFrom;
     private string $baseCurrency;
@@ -19,6 +22,7 @@ final class CalculateCommissionsCommand extends CachedCommand {
     private BinToCountryCodeConverterInterface $binConverter;
     private ExchangeRateProviderInterface $exchangeRateProvider;
     private CommissionCalculatorInterface $commissionCalculator;
+    private RoundingMode $roundingMode;
 
     function __construct(array $env)
     {
@@ -29,8 +33,8 @@ final class CalculateCommissionsCommand extends CachedCommand {
         $this->binConverter = new $env['BIN_CONVERTER_PROVIDER']($env['BIN_CONVERTER_PROVIDER_KEY']);
         $this->exchangeRateProvider = new $env['EXCHANGE_RATE_PROVIDER']($env['EXCHANGE_RATE_PROVIDER_KEY']);
         $this->commissionCalculator = new $env['COMMISION_CALCULATOR']();
+        $this->roundingMode = constant('Brick\Math\RoundingMode::'.$env['ROUNDING_MODE']);
         $this->cachedVars = [
-            'ExchangeRates' => $env['EXCHANGE_RATE_CACHE_EXPIRATION'] ?? strtotime('+1 hour') - time(),
             'BinCountryCodes' => $env['BIN_CONVERTER_CACHE_EXPIRATION'] ?? strtotime('+1 hour') - time()
         ];
 
@@ -41,17 +45,20 @@ final class CalculateCommissionsCommand extends CachedCommand {
     {
         try {
             $this->preloadCachedVars();
-            $transformer = new TransactionDataTransformer();
+            $transactionTransformer = new TransactionDataTransformer();
+            $currencyTransformer = new TransactionCurrencyDataTransformer();
             $commissionCalculator = $this->commissionCalculator;
             foreach ($this->reader->read($this->readFrom) as $record) {
                 if (empty($record)) {
                     continue;
                 }
-                $transaction = $transformer($this->parser->parse($record));
-                $exchangeRate = $transaction->currency === $this->baseCurrency ? 1 : $this->getExchangeRateFor($transaction->currency);
+                $transaction = $transactionTransformer($this->parser->parse($record), $this->baseCurrency, $this->exchangeRateProvider, $this->roundingMode);
+                if ($transaction->currency !== $this->baseCurrency) {
+                    $transaction = $currencyTransformer($transaction, $this->baseCurrency, $this->exchangeRateProvider, $this->roundingMode);
+                }
                 $countryCode = $this->getCountryCodeFor($transaction->bin);
-                $commission = $commissionCalculator($transaction->amount, $exchangeRate, $countryCode);
-                echo number_format($commission, 2, '.', '') . \PHP_EOL;
+                $commission = $commissionCalculator($transaction->amount, $countryCode);
+                echo $commission->to($transaction->amount->getContext(), $this->roundingMode) . \PHP_EOL;
             }
         } catch (\Exception $e) {
             exit($e->getMessage());
@@ -61,10 +68,5 @@ final class CalculateCommissionsCommand extends CachedCommand {
     private function getCountryCodeFor(int $bin)
     {
         return $this->getCachedOrLoad(strval($bin), 'BinCountryCodes', fn() => $this->binConverter->getCountryCode($bin));
-    }
-
-    private function getExchangeRateFor(string $currency)
-    {
-        return $this->getCachedOrLoad($currency, 'ExchangeRates', fn() => $this->exchangeRateProvider->getRate($currency, $this->baseCurrency));
     }
 }

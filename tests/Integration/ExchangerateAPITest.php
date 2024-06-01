@@ -6,6 +6,7 @@ use Tests\EnvTestCase;
 use App\Interfaces\ExchangeRateProviderInterface;
 use App\Providers\ExchangerateAPI;
 use GuzzleHttp\Exception\ClientException;
+use Brick\Money\ExchangeRateProvider\ConfigurableProvider;
 
 class ExchangerateAPITest extends EnvTestCase
 {
@@ -20,7 +21,8 @@ class ExchangerateAPITest extends EnvTestCase
     public function testGetRate(): void
     {
         $exchangeRate = self::$exchangeRateProvider->getRate('USD', 'USD');
-        $this->assertEquals(1, $exchangeRate);
+
+        $this->assertInstanceOf(ConfigurableProvider::class, $exchangeRate);
     }
 
     protected function assertPreConditions(): void

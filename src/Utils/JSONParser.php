@@ -11,15 +11,15 @@ class JSONParser implements ParserInterface {
     /**
      * @throws InvalidJSONException|InvalidRecordException
      */
-    public function parse(string $input): object
+    public function parse(string $input): array
     {
-        $output = json_decode($input);
+        $output = json_decode($input, true);
 
         if (is_null($output)) {
             throw new InvalidJSONException(__CLASS__);
         }
 
-        if (!is_object($output) || empty(get_object_vars($output))) {
+        if (!is_array($output) || empty($output)) {
             throw new InvalidRecordException($input);
         }
 

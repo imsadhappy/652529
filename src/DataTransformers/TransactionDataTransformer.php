@@ -2,39 +2,40 @@
 
 namespace App\DataTransformers;
 
-use App\Interfaces\DataTransformerInterface;
 use App\Dto\Transaction;
 use App\Exceptions\DataTransformer\MissingPropertyException;
+use Brick\Money\Exception\UnknownCurrencyException;
+use Brick\Money\Money;
 
-class TransactionDataTransformer implements DataTransformerInterface {
+class TransactionDataTransformer {
 
     /**
-     * Transform object into DTO
+     * Transform array into Transaction DTO
      *
-     * @param  object $data
-     * @throws MissingPropertyException
+     * @param  array $data
+     * @throws MissingPropertyException|UnknownCurrencyException
      */
-    public function __invoke(object $data): Transaction
+    public function __invoke(array $data): Transaction
     {
         $transaction = new Transaction();
 
-        if (empty($data->bin)) {
-            throw new MissingPropertyException('bin');
+        if (empty($data['bin'])) {
+            throw new MissingPropertyException('bin', Transaction::class);
         }
 
-        $transaction->bin = intval($data->bin);
+        $transaction->bin = intval($data['bin']);
 
-        if (!isset($data->amount)) {
-            throw new MissingPropertyException('amount');
+        if (empty($data['currency'])) {
+            throw new MissingPropertyException('currency', Transaction::class);
         }
 
-        $transaction->amount = floatval($data->amount);
+        $transaction->currency = strval($data['currency']);
 
-        if (empty($data->currency)) {
-            throw new MissingPropertyException('currency');
+        if (!isset($data['amount'])) {
+            throw new MissingPropertyException('amount', Transaction::class);
         }
 
-        $transaction->currency = strval($data->currency);
+        $transaction->amount = Money::of($data['amount'], $transaction->currency);
 
         return $transaction;
     }

@@ -4,22 +4,25 @@ namespace App\DataTransformers;
 
 use App\Interfaces\CommissionCalculatorInterface;
 
+use Brick\Money\Money;
+use Brick\Math\RoundingMode;
+
 class BaseCommissionCalculator implements CommissionCalculatorInterface {
 
-    public function getCommissionRate(float $amount, float $exchangeRate, string $countryCode): float
+    public function getCommissionRate(Money $amount, string $countryCode): float
     {
         return 0.0;
     }
 
-    function __invoke(float $amount, float $exchangeRate = 1.0, string $countryCode = ''): float
+    function __invoke(Money $amount, string $countryCode = '', RoundingMode $roundingMode = RoundingMode::UP): Money
     {
-        if ($amount <= 0.0 || $exchangeRate <= 0.0) {
-            throw new \RangeException("Positive values required");
+
+        if ($amount->getAmount()->isNegativeOrZero()) {
+            throw new \RangeException("Can't apply commission to negative amount");
         }
 
-        $ammountInBaseCurrency = $amount * $exchangeRate;
-        $commission = $ammountInBaseCurrency * $this->getCommissionRate($amount, $exchangeRate, $countryCode);
+        $commisionRate = $this->getCommissionRate($amount, $countryCode);
 
-        return round($commission, 2);
+        return $amount->multipliedBy($commisionRate, $roundingMode);
     }
 }
