@@ -60,7 +60,7 @@ final class CalculateTransactionCommissionCommand extends CachedCommand {
         }
     }
 
-    private function calculate(array $parsedRecord): float
+    private function calculate(array $parsedRecord)
     {
         $transform = $this->transactionTransformer;
         $exchange = $this->currencyTransformer;
