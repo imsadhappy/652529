@@ -31,7 +31,7 @@ class JSONParserTest extends TestCase
 
     public function testParseRecords(): void
     {
-        $this->assertIsObject(self::$parser->parse('{"foo":"bar"}'));
+        $this->assertIsArray(self::$parser->parse('{"foo":"bar"}'));
     }
 
     public static function setUpBeforeClass(): void

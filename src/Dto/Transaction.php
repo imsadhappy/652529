@@ -2,9 +2,11 @@
 
 namespace App\Dto;
 
+use Brick\Money\Money;
+
 class Transaction
 {
     public int $bin;
-    public float $amount;
+    public Money $amount;
     public string $currency;
 }

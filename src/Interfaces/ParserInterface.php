@@ -4,5 +4,5 @@ namespace App\Interfaces;
 
 interface ParserInterface {
 
-    public function parse(string $input): object;
+    public function parse(string $input): array;
 }

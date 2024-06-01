@@ -4,8 +4,8 @@ namespace App\Exceptions\DataTransformer;
 
 final class MissingPropertyException extends \Exception
 {
-    public function __construct(string $propertyName)
+    public function __construct(string $propertyName, string $dto)
     {
-        parent::__construct("Missing Transaction property '$propertyName'");
+        parent::__construct("Missing property '$propertyName' for $dto");
     }
 }

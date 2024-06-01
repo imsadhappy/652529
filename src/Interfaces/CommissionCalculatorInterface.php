@@ -2,7 +2,9 @@
 
 namespace App\Interfaces;
 
-interface CommissionCalculatorInterface extends DataTransformerInterface {
+use Brick\Money\Money;
 
-    public function getCommissionRate(float $amount, float $exchangeRate, string $countryCode): float;
+interface CommissionCalculatorInterface {
+
+    public function getCommissionRate(Money $amount, string $countryCode): float;
 }

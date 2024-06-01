@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use App\DataTransformers\BaseCommissionCalculator;
 use App\DataTransformers\EUCommissionCalculator;
-use App\Interfaces\CommissionCalculatorInterface;
+use Brick\Money\Money;
 
 class CommissionCalculatorsTest extends TestCase
 {
@@ -14,24 +14,19 @@ class CommissionCalculatorsTest extends TestCase
     {
         $this->expectException(\RangeException::class);
         $commissionCalculator = new BaseCommissionCalculator();
-        $commissionCalculator(-0.01);
+        $commissionCalculator(Money::of(-1, 'USD'));
     }
 
     public function testCalculateBaseCommission(): void
     {
         $commissionCalculator = new BaseCommissionCalculator();
-        $this->assertEquals(0.0, $commissionCalculator(100));
+        $this->assertSame('0.00', (string) $commissionCalculator(Money::of(1, 'USD'))->getAmount());
     }
 
-    public function testCalculateEuCommission(): void
+    public function testCalculateEuCommissions(): void
     {
         $commissionCalculator = new EUCommissionCalculator();
-        $this->assertEquals(1.00, $commissionCalculator(100, 1, 'LV'));
-    }
-
-    public function testCalculateNonEuCommission(): void
-    {
-        $commissionCalculator = new EUCommissionCalculator();
-        $this->assertEquals(2.00, $commissionCalculator(100, 1, 'US'));
+        $this->assertSame('1.00', (string) $commissionCalculator(Money::of(100, 'EUR'), 'LV')->getAmount());
+        $this->assertSame('2.00', (string) $commissionCalculator(Money::of(100, 'EUR'), 'US')->getAmount());
     }
 }
